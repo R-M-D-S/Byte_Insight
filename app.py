@@ -22,11 +22,9 @@ data = df.to_sql(name='Sales',con=temp_db)
 
 
 #%% Set-up Open AI API Key
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-client = OpenAI(
-    # This is the default and can be omitted
-    api_key=OPENAI_API_KEY,
-)
+#OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+##    api_key=OPENAI_API_KEY,
+#)
 
 
 
@@ -111,6 +109,26 @@ st.markdown(
 # Header
 st.markdown('<h1 class="center-text">Byte Insight💡</h1>', unsafe_allow_html=True)
 st.markdown('<h3 class="center-text">AI-Powered Data Query and Visualization🦾</h3>', unsafe_allow_html=True)
+
+with st.sidebar:
+        default_openai_api_key = os.getenv("OPENAI_API_KEY") if os.getenv("OPENAI_API_KEY") is not None else ""  # only for development environment, otherwise it should return None
+        with st.popover("🔐 OpenAI API Key"):
+            openai_api_key = st.text_input("Introduce your OpenAI API Key (https://platform.openai.com/)", value=default_openai_api_key, type="password")
+
+    # --- Main Content ---
+# Checking if the user has introduced the OpenAI API Key, if not, a warning is displayed
+if openai_api_key == "" or openai_api_key is None or "sk-" not in openai_api_key:
+    st.write("#")
+    st.warning("⬅️ Please introduce your OpenAI API Key (make sure to have funds) to continue...")  
+
+    with st.sidebar:
+        st.write("#")
+        st.write("#")
+        st.video("EQ.mp4")
+        st.write("📋[Stemperiodt Blog](https://stemperiodt.co.za/blog/)")
+
+else:
+    client = OpenAI(api_key=openai_api_key)          
 
 # Image
 image = Image.open("Data.png")  # Replace with your image path
