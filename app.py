@@ -7,6 +7,8 @@ import seaborn as sns
 import os
 from dotenv import load_dotenv
 from PIL import Image
+import io
+import base64
 
 #%% Load environment variables (e.g., for API keys)
 from dotenv import load_dotenv
@@ -72,6 +74,18 @@ def generate_plot_code(df):
         max_tokens=4000,
     )
     return remove_backticks(response.choices[0].message.content.strip())
+
+def generate_plot_description(plot_code):
+    """Generate a description of the plot using GPT based on the plot code."""
+    prompt = f"Describe the following Python plot code:\n\n{plot_code}"
+    response = client.chat.completions.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0,
+        max_tokens=4000,
+    )
+    return response.choices[0].message.content.strip()
+
 
 #%% Streamlit Page Layout
 # Set page configuration
@@ -185,6 +199,11 @@ if st.button("Visualize Data"):
         # Display the plot in Streamlit
         st.write("### Step 3: Visualized Results")
         st.pyplot(plt.gcf())
+
+        # Generate and display the plot description
+        plot_description = generate_plot_description(plot_code)
+        st.write("### Plot Description")
+        st.write(plot_description)
 
 # Footer
 st.markdown("---")
