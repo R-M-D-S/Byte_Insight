@@ -12,6 +12,7 @@ import base64
 
 #%% Load environment variables (e.g., for API keys)
 from dotenv import load_dotenv
+
 load_dotenv()
 
 #%% Data preparation
