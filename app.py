@@ -75,6 +75,24 @@ def generate_plot_code(df):
     )
     return remove_backticks(response.choices[0].message.content.strip())
 
+def image_to_base64(img):
+    """Convert an image to base64 format."""
+    buffered = io.BytesIO()
+    img.save(buffered, format="PNG")
+    img_bytes = buffered.getvalue()
+    return base64.b64encode(img_bytes).decode()
+
+def add_image_to_gpt_message(image_base64, image_type="image/png"):
+    """Add image to GPT message as base64 encoded string."""
+    return {
+        "role": "user",
+        "content": [
+            {
+                "type": "image_url",
+                "image_url": {"url": f"data:{image_type};base64,{image_base64}"}
+            }
+        ]
+    }
 
 #%% Streamlit Page Layout
 # Set page configuration
@@ -188,6 +206,28 @@ if st.button("Visualize Data"):
         # Display the plot in Streamlit
         st.write("### Step 3: Visualized Results")
         st.pyplot(plt.gcf())
+        # Save the generated plot as an image in-memory
+        img_buffer = io.BytesIO()
+        plt.savefig(img_buffer, format='png')
+        img_buffer.seek(0)
+
+        # Convert the image to base64 for GPT analysis
+        img = Image.open(img_buffer)
+        img_base64 = image_to_base64(img)
+
+         # Add the image to the GPT message
+        gpt_message = add_image_to_gpt_message(img_base64, image_type="image/png")
+
+        # Send the base64 image to GPT-4 for analysis
+        with st.spinner("Analyzing the figure..."):
+            analysis_response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[gpt_message],
+                temperature=0,
+                max_tokens=4000,
+            )
+            st.write("### Step 4: Visual Analysis")
+            st.write(analysis_response.choices[0].message.content)
 # Footer
 st.markdown("---")
 st.write("Designed By Royal Mcgrady Data Science")
