@@ -146,8 +146,8 @@ if openai_api_key == "" or openai_api_key is None or "sk-" not in openai_api_key
     with st.sidebar:
         st.write("#")
         st.write("#")
-        st.video("EQ.mp4")
-        st.write("📋[Stemperiodt Blog](https://stemperiodt.co.za/blog/)")
+        #st.video("EQ.mp4")
+        #st.write("📋[Stemperiodt Blog](https://stemperiodt.co.za/blog/)")
 
 else:
     client = OpenAI(api_key=openai_api_key)          
