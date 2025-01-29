@@ -16,12 +16,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 #%% Data preparation
-df = pd.read_csv("sales_data_sample.csv")
+df = pd.read_csv("sql.csv")
 
 
 #%%SQL Database Set-up
 temp_db = create_engine('sqlite:///:memory:', echo=True)
-data = df.to_sql(name='Sales',con=temp_db)
+data = df.to_sql(name='Client',con=temp_db)
 
 
 #%% Set-up Open AI API Key
@@ -36,7 +36,7 @@ data = df.to_sql(name='Sales',con=temp_db)
 def create_table_definition_prompt(df):
     """Create a SQL table structure definition as prompt for GPT."""
     columns = ", ".join(df.columns)
-    return f"### sqlite SQL table with columns:\n# Sales({columns})\n"
+    return f"### sqlite SQL table with columns:\n# Client({columns})\n"
 
 def combine_prompts(df, query_prompt):
     """Combine table definition and user query prompt."""
@@ -69,7 +69,7 @@ def generate_plot_code(df):
     columns = ", ".join(df.columns)
     prompt = f"Generate Python code to plot a DataFrame with columns: {columns} using matplotlib. Output only the code such that it can be immediately executed in python. And be creative with the types of graphs produced"
     response = client.chat.completions.create(
-        model="gpt-4o",
+        model="chatgpt-4o-latest",
         messages=[{"role": "user", "content": prompt}],
         temperature=0,
         max_tokens=4000,
@@ -98,7 +98,7 @@ def add_image_to_gpt_message(image_base64, image_type="image/png"):
 #%% Streamlit Page Layout
 # Set page configuration
 st.set_page_config(
-    page_title="Byte Insight - AI SQL Query and Data Visualization",
+    page_title="Deal Decoder - AI SQL Query and Data Visualization",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -129,7 +129,7 @@ st.markdown(
 )
 
 # Header
-st.markdown('<h1 class="center-text">Byte Insight💡</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="center-text">Deal Decoder 💡</h1>', unsafe_allow_html=True)
 st.markdown('<h3 class="center-text">AI-Powered Data Query and Visualization🦾</h3>', unsafe_allow_html=True)
 
 with st.sidebar:
@@ -222,7 +222,7 @@ if st.button("Visualize Data"):
         # Send the base64 image to GPT-4 for analysis
         with st.spinner("Analyzing the figure..."):
             analysis_response = client.chat.completions.create(
-                model="gpt-4o",
+                model="chatgpt-4o-latest",
                 messages=[gpt_message],
                 temperature=0,
                 max_tokens=4000,
@@ -231,4 +231,4 @@ if st.button("Visualize Data"):
             st.write(analysis_response.choices[0].message.content)
 # Footer
 st.markdown("---")
-st.write("Designed By Royal Mcgrady Data Science")
+st.write("Designed By Royal Mcgrady")
