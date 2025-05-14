@@ -4,6 +4,7 @@ from openai import OpenAI
 from sqlalchemy import create_engine, text
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 import os
 from dotenv import load_dotenv
 from PIL import Image
@@ -67,7 +68,7 @@ def remove_backticks(input_string):
 def generate_plot_code(df):
     """Generate Python plotting code using GPT based on the dataframe structure."""
     columns = ", ".join(df.columns)
-    prompt = f"Generate Python code to plot a DataFrame with columns: {columns} using matplotlib. Output only the code such that it can be immediately executed in python. And be creative with the types of graphs produced"
+    prompt = f"Generate Python code to plot a DataFrame with columns: {columns} using matplotlib. Output only the code such that it can be immediately executed in python. Be creative with the types of graphs outputted but ensure the data displayed is from the inputted data not dummy data. Do not use seaborn-darkgrid"
     response = client.chat.completions.create(
         model="chatgpt-4o-latest",
         messages=[{"role": "user", "content": prompt}],
@@ -98,7 +99,7 @@ def add_image_to_gpt_message(image_base64, image_type="image/png"):
 #%% Streamlit Page Layout
 # Set page configuration
 st.set_page_config(
-    page_title="Deal Decoder - AI SQL Query and Data Visualization",
+    page_title="WardWise - AI SQL Query and Data Visualization",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -129,7 +130,7 @@ st.markdown(
 )
 
 # Header
-st.markdown('<h1 class="center-text">Deal Decoder 💡</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="center-text">WardWise 💡</h1>', unsafe_allow_html=True)
 st.markdown('<h3 class="center-text">AI-Powered Data Query and Visualization🦾</h3>', unsafe_allow_html=True)
 
 with st.sidebar:
@@ -202,6 +203,7 @@ if st.button("Visualize Data"):
         # Dynamically execute the generated plot code in a secure manner
         figure, ax = plt.subplots()
         # Use exec() but ensure the plot is built correctly by capturing the generated figure
+        
         exec(plot_code, {"df": result_df, "plt": plt, "ax": ax})
 
         # Display the plot in Streamlit
